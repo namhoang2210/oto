@@ -1,0 +1,82 @@
+[
+  {
+      "id": 1,
+      "username": "nguyenanh",
+      "password": "password",
+      "name": "Nguyễn Văn Anh",
+      "email": "nva@gmail.com",
+      "phone": "0987654321",
+      "address": "Hà Nội",
+      "created_at": "2023-11-01T08:30:00Z"
+  },
+  {
+      "id": 2,
+      "username": "binhtran",
+      "password": "password",
+      "name": "Trần Thị Bình",
+      "email": "ttb@gmail.com",
+      "phone": "0987654322",
+      "address": "Đà Nẵng",
+      "created_at": "2023-11-02T10:15:00Z"
+  },
+  {
+      "id": 3,
+      "username": "cuongle",
+      "password": "password",
+      "name": "Lê Văn Cường",
+      "email": "lvc@gmail.com",
+      "phone": "0987654323",
+      "address": "Hồ Chí Minh",
+      "created_at": "2023-11-03T12:45:00Z"
+  },
+  {
+      "id": 4,
+      "username": "thuhuong",
+      "password": "password",
+      "name": "Phạm Thu Hương",
+      "email": "pth@gmail.com",
+      "phone": "0987654324",
+      "address": "Hải Phòng",
+      "created_at": "2023-11-04T09:00:00Z"
+  },
+  {
+      "id": 5,
+      "username": "minhnguyen",
+      "password": "password",
+      "name": "Nguyễn Minh Tuấn",
+      "email": "nmt@gmail.com",
+      "phone": "0987654325",
+      "address": "Cần Thơ",
+      "created_at": "2023-11-05T11:20:00Z"
+  },
+  {
+      "id": 6,
+      "username": "hanhphuc",
+      "password": "password",
+      "name": "Lê Hạnh Phúc",
+      "email": "lhp@gmail.com",
+      "phone": "0987654326",
+      "address": "Nha Trang",
+      "created_at": "2023-11-06T14:30:00Z"
+  },
+  {
+      "id": 7,
+      "username": "hoanglinh",
+      "password": "password",
+      "name": "Vũ Hoàng Linh",
+      "email": "vhl@gmail.com",
+      "phone": "0987654327",
+      "address": "Quảng Ninh",
+      "created_at": "2023-11-07T16:00:00Z"
+  },
+  {
+      "id": 8,
+      "username": "khanhvy",
+      "password": "password",
+      "name": "Nguyễn Khánh Vy",
+      "email": "nkv@gmail.com",
+      "phone": "0987654328",
+      "address": "Huế",
+      "created_at": "2023-11-08T13:45:00Z"
+  }
+]

@@ -1,0 +1,38 @@
+[
+    {
+        "id": 1,
+        "user_id": 1,
+        "name": "Nguyễn Văn Anh",
+        "email": "nva@gmail.com",
+        "phone": "0987654321",
+        "address": "Hà Nội",
+        "order_car_code": "F85CD",
+        "code": "OD001",
+        "status": "in_progress",
+        "created_at": "2023-11-01T08:30:00Z"
+    },
+    {
+        "id": 2,
+        "user_id": 2,
+        "name": "Trần Thị Bình",
+        "email": "ttb@gmail.com",
+        "phone": "0987654322",
+        "address": "Đà Nẵng",
+        "order_car_code": "F85AB",
+        "code": "OD002",
+        "status": "in_progress",
+        "created_at": "2023-11-02T10:15:00Z"
+    },
+    {
+        "id": 3,
+        "user_id": 3,
+        "name": "Lê Văn Cường",
+        "email": "lvc@gmail.com",
+        "phone": "0987654323",
+        "address": "Hồ Chí Minh",
+        "order_car_code": "F84YD",
+        "code": "OD003",
+        "status": "completed",
+        "created_at": "2023-11-03T12:45:00Z"
+    }
+]
