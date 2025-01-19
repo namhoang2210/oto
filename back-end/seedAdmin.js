@@ -9,7 +9,7 @@ const createAdmin = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
 
-    const existingAdmin = await User.findOne({ username: 'nguyenanh' });
+    const existingAdmin = await User.findOne({ username: 'admin' });
     if (existingAdmin) {
       console.log('Admin đã tồn tại!');
       return process.exit();

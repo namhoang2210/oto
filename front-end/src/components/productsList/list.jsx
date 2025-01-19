@@ -11,7 +11,7 @@ class ProductList extends Component {
           <thead className="text-xs text-gray-700 uppercase bg-gray-100 ">
             <tr>
               <th scope="col" className="px-6 py-3">
-                ID
+                NO
               </th>
               <th scope="col" className="px-6 py-3">
                 Mã xe
@@ -41,7 +41,7 @@ class ProductList extends Component {
             {products.length > 0 ? (
               products.map((product, key) => (
                 <tr
-                  key={product.id}
+                  key={product._id}
                   className={`bottom-t ${
                     key % 2 === 0 ? "bg-white" : "bg-gray-50"
                   }`}
@@ -50,7 +50,7 @@ class ProductList extends Component {
                     scope="row"
                     className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                   >
-                    {product?.id}
+                    {key+1}
                   </th>
                   <td className="px-6 py-4">{product?.code}</td>
                   <td className="px-6 py-4">{product?.model}</td>

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import withAdminLayout from "../../hoc/withAdminLayout";
 import ProductsList from "../../components/productsList/list";
 import ProductEditor from "../../components/productsList/editor";
+import API from "../../api";
 
 class Products extends Component {
   constructor(props) {
@@ -15,26 +16,34 @@ class Products extends Component {
   }
 
   componentDidMount() {
-    const storedProducts = localStorage.getItem("listProduct");
-    if (storedProducts) {
-      const products = JSON.parse(storedProducts);
-      products.sort((a, b) => b.id - a.id);
-      this.setState({ products });
-    }
+    API.get('/products')
+      .then((response) => {
+        const products = response.data;
+        products.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        this.setState({ products });
+      })
+      .catch((error) => {
+        console.error('Error fetching products:', error);
+      });
   }
+  
 
   handleDelete = (productDelete) => {
-    const confirmation = window.confirm(
-      `Bạn có chắc chắn muốn xóa ${productDelete.name}?`
-    );
+    const confirmation = window.confirm(`Bạn có chắc chắn muốn xóa ${productDelete.model}?`);
     if (!confirmation) return;
-
-    const updatedProducts = this.state.products.filter(
-      (product) => product.id !== productDelete.id
-    );
-    this.setState({ products: updatedProducts });
-    localStorage.setItem("listProduct", JSON.stringify(updatedProducts));
+  
+    API.delete(`/products/${productDelete._id}`)
+      .then(() => {
+        const updatedProducts = this.state.products.filter(
+          (product) => product._id !== productDelete._id
+        );
+        this.setState({ products: updatedProducts });
+      })
+      .catch((error) => {
+        console.error('Error deleting product:', error);
+      });
   };
+  
 
   toggleModal = () => {
     this.setState({
@@ -47,8 +56,15 @@ class Products extends Component {
     this.setState({ isModalOpen: true, editingProduct: product });
   };
 
-  updateProductList = (updatedProducts) => {
-    this.setState({ products: updatedProducts.sort((a, b) => b.id - a.id) });
+  updateProductList = () => {
+    API.get('/products')
+      .then((response) => {
+        const products = response.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        this.setState({ products });
+      })
+      .catch((error) => {
+        console.error('Error fetching updated product list:', error);
+      });
   };
 
   handleFilterChange = (event) => {

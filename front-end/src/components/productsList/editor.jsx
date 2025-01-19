@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import InputField from '../shared/InputField';
 import SelectField from '../shared/SelectField';
 import Modal from '../shared/Modal';
+import API from '../../api';
 
 class ProductEditor extends Component {
   constructor(props) {
@@ -47,31 +48,32 @@ class ProductEditor extends Component {
 
 
   handleSubmit = (values, { resetForm }) => {
-    const storedProducts = JSON.parse(localStorage.getItem('listProduct')) || [];
-    
-    if (this.props.product) {
-      const updatedProducts = storedProducts.map(product =>
-        product.id === this.props.product.id ? { ...product, ...values } : product
-      );
-      localStorage.setItem('listProduct', JSON.stringify(updatedProducts));
-      this.props.updateProductList(updatedProducts);
+    const { product } = this.props;
+  
+    if (product) {
+      // Cập nhật sản phẩm
+      API.put(`/products/${product._id}`, values)
+        .then((_response) => {
+          this.props.updateProductList();
+        })
+        .catch((error) => {
+          console.error('Error updating product:', error);
+        });
     } else {
-      const maxId = storedProducts.length > 0 ? Math.max(...storedProducts.map(product => product.id)) : 0;
-      const newProduct = {
-        id: maxId + 1,
-        status: 'in_stock',
-        created_at: new Date().toISOString(),
-        ...values,
-      };
-      const updatedProducts = [...storedProducts, newProduct];
-      localStorage.setItem('listProduct', JSON.stringify(updatedProducts));
-      this.props.updateProductList(updatedProducts);
+      // Thêm sản phẩm mới
+      API.post('/products', values)
+        .then((_response) => {
+          this.props.updateProductList();
+        })
+        .catch((error) => {
+          console.error('Error creating product:', error);
+        });
     }
-
+  
     resetForm();
     this.props.toggleModal();
   };
-
+  
   render() {
     const { isModalOpen, toggleModal } = this.props;
 
@@ -265,7 +267,7 @@ class ProductEditor extends Component {
                       type="submit"
                       className="text-white border bg-blue-500 border-blue-500 hover:bg-blue-600 font-medium rounded-md text-sm px-5 py-2 text-center"
                     >
-                      Thêm
+                      {this.props.product ? 'Sửa' : 'Thêm'}
                     </button>
                     <button
                       type="button"

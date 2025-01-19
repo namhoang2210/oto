@@ -3,6 +3,8 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 const cors = require('cors');
 
 dotenv.config();
@@ -14,6 +16,8 @@ app.use(express.json());
 
 app.use('/api', authRoutes);
 app.use('/api', productRoutes);
+app.use('/api', orderRoutes);
+app.use('/api', paymentRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server chạy tại port ${PORT}`));
