@@ -12,7 +12,7 @@ const productSchema = new mongoose.Schema({
   fuel_type: { type: String },
   license_plate: { type: String },
   location: { type: String },
-  status: { type: String, enum: ['in_stock', 'out_of_stock'], default: 'in_stock' },
+  status: { type: String, enum: ['in_stock', 'in_order', 'sold'], default: 'in_stock' },
   created_at: { type: Date, default: Date.now }
 });
 

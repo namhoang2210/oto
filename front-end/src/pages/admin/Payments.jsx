@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import withAdminLayout from "../../hoc/withAdminLayout";
 import formatDate from "../../commons/formatDatetime";
+import API from "../../api";
 
 class Payment extends Component {
   constructor(props) {
@@ -11,42 +12,34 @@ class Payment extends Component {
   }
 
   componentDidMount() {
-    const storedPayments = localStorage.getItem("listPayment");
-
-    if (storedPayments) {
-      const payments = JSON.parse(storedPayments);
-      payments.sort((a, b) => b.id - a.id);
+    API.get('/payments')
+    .then((response) => {
+      const payments = response.data.payments;
+      payments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       this.setState({ payments });
-    }
+    })
+    .catch((error) => {
+      console.error('Error fetching products:', error);
+    });
   }
 
-  getOrder = (order_car_code) => {
-    const { products } = this.state;
-    const product = products.find((product) => product.code === order_car_code);
-    return product?.code + " - " + product?.model + " - " + product?.location;
-  };
-
   updateStatus = (paymentId) => {
-    const { payments } = this.state;
-    const updatedPayments = payments.map((payment) =>
-      payment.id === paymentId ? { ...payment, status: "confirmed" } : payment
-    );
-
-    this.setState({ payments: updatedPayments });
-    localStorage.setItem("listPayment", JSON.stringify(updatedPayments));
+    API.put(`/payments/${paymentId}`, {status: 'confirmed'})
+    .then((_response) => {
+      const { payments } = this.state;
+      const updatedPayments = payments.map((payment) =>
+        payment._id === paymentId ? { ...payment, status: "confirmed" } : payment
+      );
+  
+      this.setState({ payments: updatedPayments });
+    })
+    .catch((error) => {
+      console.error('Error updating order:', error);
+    });
   };
 
   render() {
     const { payments } = this.state;
-
-    const getOrderByCode = (orderCode) => {
-      const storedOrders = localStorage.getItem("listOrder");
-      if (storedOrders) {
-        const orders = JSON.parse(storedOrders);
-        const order = orders.find((order) => order.code === orderCode);
-        return order;
-      }
-    }
 
     return (
       <>
@@ -60,7 +53,7 @@ class Payment extends Component {
             <thead className="text-xs text-gray-700 uppercase bg-gray-100 ">
               <tr>
                 <th scope="col" className="px-6 py-3">
-                  ID
+                  NO
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Mã đơn
@@ -90,7 +83,7 @@ class Payment extends Component {
               {payments.length > 0 ? (
                 payments.map((payment, key) => (
                   <tr
-                    key={payment.id}
+                    key={payment._id}
                     className={`bottom-t ${
                       key % 2 === 0 ? "bg-white" : "bg-gray-50"
                     }`}
@@ -99,11 +92,11 @@ class Payment extends Component {
                       scope="row"
                       className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                     >
-                      {payment?.id}
+                      {key+1}
                     </th>
-                    <td className="px-6 py-4">{payment?.order_code}</td>
-                    <td className="px-6 py-4">{getOrderByCode(payment.order_code).name}</td>
-                    <td className="px-6 py-4">{getOrderByCode(payment.order_code).phone}</td>
+                    <td className="px-6 py-4">{payment.order_id.code}</td>
+                    <td className="px-6 py-4">{payment.user_id.name}</td>
+                    <td className="px-6 py-4">{payment.user_id.phone}</td>
                     <td className="px-6 py-4">
                       {new Intl.NumberFormat("vi-VN").format(payment?.total)}
                     </td>
@@ -126,7 +119,7 @@ class Payment extends Component {
                     <td className="float-right items-center px-6 py-2">
                       {payment.status === "confirming" && (
                         <button
-                          onClick={() => this.updateStatus(payment.id)}
+                          onClick={() => this.updateStatus(payment._id)}
                           className="text-white border border-yellow-500 bg-yellow-500 hover:bg-yellow-400 font-medium rounded-lg text-sm px-4 py-2 text-center mr-2"
                         >
                           Xác nhận thanh toán

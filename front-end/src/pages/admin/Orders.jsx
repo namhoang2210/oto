@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import withAdminLayout from "../../hoc/withAdminLayout";
 import formatDate from "../../commons/formatDatetime";
+import API from "../../api";
 
 class Order extends Component {
   constructor(props) {
@@ -12,34 +13,30 @@ class Order extends Component {
   }
 
   componentDidMount() {
-    const storedOrders = localStorage.getItem("listOrder");
-    if (storedOrders) {
-      const orders = JSON.parse(storedOrders);
-      orders.sort((a, b) => b.id - a.id);
+    API.get('/orders')
+    .then((response) => {
+      const orders = response.data.orders;
+      orders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       this.setState({ orders });
-    }
-
-    const storedProducts = localStorage.getItem("listProduct");
-    if (storedProducts) {
-      const products = JSON.parse(storedProducts);
-      this.setState({ products });
-    }
+    })
+    .catch((error) => {
+      console.error('Error fetching products:', error);
+    });
   }
 
-  getOrder = (order_car_code) => {
-    const { products } = this.state;
-    const product = products.find((product) => product.code === order_car_code);
-    return product?.code + " - " + product?.model + " - " + product?.location;
-  };
-
   updateOrderStatus = (orderId) => {
-    const { orders } = this.state;
-    const updatedOrders = orders.map((order) =>
-      order.id === orderId ? { ...order, status: "completed" } : order
-    );
-
-    this.setState({ orders: updatedOrders });
-    localStorage.setItem("listOrder", JSON.stringify(updatedOrders));
+    API.put(`/orders/${orderId}`, {status: 'completed'})
+    .then((_response) => {
+      const { orders } = this.state;
+      const updatedOrders = orders.map((order) =>
+        order._id === orderId ? { ...order, status: "completed" } : order
+      );
+  
+      this.setState({ orders: updatedOrders });
+    })
+    .catch((error) => {
+      console.error('Error updating order:', error);
+    });
   };
 
   render() {
@@ -57,7 +54,7 @@ class Order extends Component {
             <thead className="text-xs text-gray-700 uppercase bg-gray-100 ">
               <tr>
                 <th scope="col" className="px-6 py-3">
-                  ID
+                  NO
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Mã đơn
@@ -86,7 +83,7 @@ class Order extends Component {
               {orders.length > 0 ? (
                 orders.map((order, key) => (
                   <tr
-                    key={order.id}
+                    key={order._id}
                     className={`bottom-t ${
                       key % 2 === 0 ? "bg-white" : "bg-gray-50"
                     }`}
@@ -95,14 +92,14 @@ class Order extends Component {
                       scope="row"
                       className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                     >
-                      {order?.id}
+                      {key + 1}
                     </th>
                     <td className="px-6 py-4">{order?.code}</td>
-                    <td className="px-6 py-4">{order?.name}</td>
-                    <td className="px-6 py-4">{order?.phone}</td>
+                    <td className="px-6 py-4">{order?.user_id.name}</td>
+                    <td className="px-6 py-4">{order?.user_id.phone}</td>
 
                     <td className="px-6 py-4">
-                      {this.getOrder(order?.order_car_code)}
+                      {order.product_id.model}
                     </td>
 
                     <td className="px-6 py-4">
@@ -122,7 +119,7 @@ class Order extends Component {
                     <td className="float-right items-center px-6 py-2">
                       {order.status === "in_progress" && (
                       <button
-                        onClick={() => this.updateOrderStatus(order.id)}
+                        onClick={() => this.updateOrderStatus(order._id)}
                         className="text-white border border-yellow-500 bg-yellow-500 hover:bg-yellow-400 font-medium rounded-lg text-sm px-4 py-2 text-center mr-2"
                       >
                         Xác nhận đã xử lý
