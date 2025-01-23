@@ -1,4 +1,5 @@
 import React from 'react';
+import API from "../api";
 
 const UserContext = React.createContext();
 
@@ -13,11 +14,15 @@ class UserProvider extends React.Component {
 		if (user) {
 			this.setState({ user });
 
-			const carts = JSON.parse(localStorage.getItem('carts'));
-			if (carts) {
-				const cartData = carts.filter(cart => cart.customer_id === user.id);
-				this.setState({ carts : cartData });
-			}
+			API.get(`/carts?user_id=${user._id}`)
+				.then((response) => {
+				const carts = response.data.carts;
+				carts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+				this.setState({ carts });
+				})
+				.catch((error) => {
+				console.error('Error fetching products:', error);
+				});
 		}
 
 	}
@@ -27,10 +32,17 @@ class UserProvider extends React.Component {
 		localStorage.setItem('user', JSON.stringify(user));
 	};
 
-	setCarts = (carts) => {
-		const cartData = carts.filter(cart => cart.customer_id === this.state.user?.id);
-		this.setState({ carts : cartData });
-		localStorage.setItem('carts', JSON.stringify(carts));
+	setCarts = () => {
+		API.get(`/carts?user_id=${this.state.user._id}`)
+			.then((response) => {
+			const carts = response.data.carts;
+			carts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+			this.setState({ carts });
+			})
+			.catch((error) => {
+			console.error('Error fetching products:', error);
+			});
+
 	}
 
 	render() {

@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { UserContext } from '../../contexts/userContext';
+import API from '../../api';
 
 class CarCard extends Component {
   static contextType = UserContext;
 
-  addToCart = () => {
+  addToCart = async() => {
     const { data } = this.props;
     const isAuthenticated = localStorage.getItem('isAuthenticated');
 
@@ -13,18 +14,12 @@ class CarCard extends Component {
       return;
     }
 
-    const existingCart = JSON.parse(localStorage.getItem('carts')) || [];
+    await API.post('/carts', {
+      user_id: JSON.parse(localStorage.getItem('user'))._id,
+      product_id: data._id
+    })
 
-    const newCartItem = {
-      customer_id: JSON.parse(localStorage.getItem('user')).id,
-      product_name: data.model,
-      order_car_code: data.code,
-      price: data.price,
-    };
-
-    const updatedCart = [...existingCart, newCartItem];
-
-    this.context.setCarts(updatedCart);
+    this.context.setCarts();
 
     alert('Đã thêm sản phẩm vào giỏ hàng!');
   };
