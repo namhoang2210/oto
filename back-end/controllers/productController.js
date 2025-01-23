@@ -3,7 +3,14 @@ const Product = require('../models/productModel');
 // Lấy tất cả sản phẩm
 exports.getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find();
+    const { status } = req.query;
+
+    const filter = {};
+    if (status) {
+      filter.status = status;
+    }
+
+    const products = await Product.find(filter);
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: 'Lỗi server' });

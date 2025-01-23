@@ -5,6 +5,7 @@ import InputField from "../../components/shared/InputField";
 import { withNavigate } from "../../hoc/withNavigate";
 import Logo from "../../components/shared/Logo";
 import { UserContext } from "../../contexts/userContext";
+import API from "../../api";
 
 class Register extends Component {
   static contextType = UserContext;
@@ -24,38 +25,35 @@ class Register extends Component {
     };
   }
 
-  handleSubmit = (values, { setFieldError }) => {
-    const { setUser } = this.context;
-
-    let customersData = JSON.parse(localStorage.getItem("listCustomer")) || [];
-
-    const existingUser = customersData.find(
-      (u) => u.username === values.username
-    );
-    if (existingUser) {
-      setFieldError("username", "Username already exists");
-      return;
-    }
-
+  handleSubmit = async(values, { setFieldError }) => {
     const newUser = {
-      id: customersData.length
-        ? Math.max(...customersData.map((u) => u.id)) + 1
-        : 1,
       username: values.username,
       password: values.password,
       name: values.name,
       email: values.email,
       phone: values.phone,
       address: values.address,
-      created_at: new Date().toISOString(),
     };
 
-    customersData.push(newUser);
+    const { setUser } = this.context;
+    await API.post('/customers/register', newUser)
+      .then(async (_response) => {
+        // login
+        const { data } = await API.post('/customer/login', {
+          username: newUser.username,
+          password: newUser.password
+        })
 
-    localStorage.setItem("listCustomer", JSON.stringify(customersData));
-		localStorage.setItem("isAuthenticated", "customer");
-    setUser(newUser); 
-    this.props.navigate("/");
+        // // Lưu token và thông tin user vào localStorage
+        localStorage.setItem("isAuthenticated", "customer");
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        setUser(data.user)
+        this.props.navigate("/");
+      })
+      .catch((error) => {
+        alert(error.response?.data?.message || "Đăng nhập thất bại. Vui lòng thử lại.")
+      });
   };
 
   render() {

@@ -8,13 +8,13 @@ export default class Header extends Component {
   static contextType = UserContext;
 
 	handleLogout = () => {
+    localStorage.removeItem("token");
 		localStorage.removeItem("isAuthenticated");
 		this.context.setUser({});
 	}
 
   render() {
     const { user, carts } = this.context;
-
     return (
       <header className="shadow fixed top-0 w-full z-10 bg-white">
         <div className="max-w-[1380px] mx-auto flex justify-between items-center py-6 font-semibold text-[#081f4d] px-4">
@@ -23,7 +23,7 @@ export default class Header extends Component {
           </Link>
           <div className="flex gap-10">
 
-            {user?.id ? (
+            {user?._id ? (
               <>
                 <Link to="/cart" className="flex items-center gap-1">
                   <CartIcon />
