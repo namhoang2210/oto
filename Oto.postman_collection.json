@@ -192,7 +192,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"username\": \"cuongle\",\n  \"password\": \"password\",\n  \"name\": \"Lê Văn Cường\",\n  \"email\": \"ttb@gmail.com\",\n  \"phone\": \"0987654322\",\n  \"address\": \"Hà Nội\"\n}",
+									"raw": "{\n  \"username\": \"cuongle1\",\n  \"password\": \"password\",\n  \"name\": \"Lê Văn Cường\",\n  \"email\": \"lvc1@gmail.com\",\n  \"phone\": \"09874454322\",\n  \"address\": \"Đà Nẵng\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -326,7 +326,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"user_id\": \"678a88d784da3e69b1be4a80\", \n  \"product_id\": \"678a81417cfe9b768565f545\", \n  \"code\": \"OD001\", \n  \"status\": \"in_progress\"\n}",
+									"raw": "{\n  \"user_id\": \"678b36db0fe7749cc7abed8d\", \n  \"product_id\": \"67892a7dbfc47fcb6d8d7f01\", \n  \"status\": \"in_progress\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -460,7 +460,25 @@
 							"name": "List payment",
 							"request": {
 								"method": "GET",
-								"header": []
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bear {{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/payments",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"payments"
+									]
+								}
 							},
 							"response": []
 						},
@@ -499,6 +517,192 @@
 										"api",
 										"payments",
 										"678c7dd46ca866148523ac2c"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Customer",
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Customer login",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"cuongle\",\n  \"password\": \"password\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/customer/login",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"customer",
+										"login"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Home",
+					"item": [
+						{
+							"name": "Get list product in stock",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:5000/api/products?status=in_stock",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"products"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "in_stock"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Cart",
+					"item": [
+						{
+							"name": "Get cart customer",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/carts?user_id=678b36db0fe7749cc7abed8d",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"carts"
+									],
+									"query": [
+										{
+											"key": "user_id",
+											"value": "678b36db0fe7749cc7abed8d"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add to cart",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3OGIzNmRiMGZlNzc0OWNjN2FiZWQ4ZCIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTczNzYzODg1OCwiZXhwIjoxNzM3NzI1MjU4fQ.uohuaxxLA3I-bDwaw5sv7FHc-xRl5wzW67uVu5J6pfs"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user_id\": \"678b36db0fe7749cc7abed8d\",\r\n    \"product_id\": \"678a80217cfe9b768565f52a\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/carts",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"carts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete cart",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\": \"678b36db0fe7749cc7abed8d\",\n    \"product_id\": \"678a80217cfe9b768565f52a\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/carts/678b36db0fe7749cc7abed8d",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"carts",
+										"678b36db0fe7749cc7abed8d"
 									]
 								}
 							},
