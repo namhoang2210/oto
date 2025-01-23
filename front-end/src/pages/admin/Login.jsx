@@ -19,7 +19,8 @@ class Login extends Component {
 
   componentDidMount() {
     const token = localStorage.getItem("token");
-    if (token) {
+    const isAuthenticated = localStorage.getItem("isAuthenticated");
+    if (token && isAuthenticated === 'admin') {
       this.props.navigate("/admin");
     }
   }

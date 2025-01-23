@@ -14,44 +14,47 @@ exports.getOrders = async (req, res) => {
 
 // Tạo đơn hàng mới
 exports.createOrder = async (req, res) => {
-    const { user_id, product_id, code, status } = req.body;
-  
-    try {
-      // Kiểm tra nếu mã đơn hàng đã tồn tại
-      const existingOrder = await Order.findOne({ code });
-      if (existingOrder) {
-        return res.status(400).json({ message: 'Mã đơn hàng đã tồn tại!' });
-      }
-  
-      // Kiểm tra nếu sản phẩm tồn tại và có trạng thái hợp lệ
-      const product = await Product.findById(product_id);
-      if (!product) {
-        return res.status(404).json({ message: 'Sản phẩm không tồn tại!' });
-      }
-  
-      if (product.status !== 'in_stock') {
-        return res.status(400).json({ message: 'Sản phẩm không khả dụng để đặt hàng!' });
-      }
-  
-      // Tạo đơn hàng mới
-      const newOrder = new Order({
-        user_id,
-        product_id,
-        code,
-        status: status || 'in_progress', // Mặc định trạng thái đơn hàng là in_progress
-      });
-      await newOrder.save();
-  
-      // Cập nhật trạng thái sản phẩm thành in_order
-      product.status = 'in_order';
-      await product.save();
-  
-      res.status(201).json({ message: 'Tạo đơn hàng thành công!', order: newOrder });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Lỗi server!' });
+  const { user_id, product_id, status } = req.body;
+
+  try {
+    // Kiểm tra nếu sản phẩm tồn tại và có trạng thái hợp lệ
+    const product = await Product.findById(product_id);
+    if (!product) {
+      return res.status(404).json({ message: 'Sản phẩm không tồn tại!' });
     }
-  };
+
+    if (product.status !== 'in_stock') {
+      return res.status(400).json({ message: 'Sản phẩm không khả dụng để đặt hàng!' });
+    }
+
+    // Lấy mã đơn hàng mới nhất
+    const latestOrder = await Order.findOne().sort({ code: -1 }); // Sắp xếp theo code giảm dần
+    let newCode = 'OD001'; // Giá trị mặc định nếu chưa có đơn hàng nào
+
+    if (latestOrder) {
+      const latestCodeNumber = parseInt(latestOrder.code.replace('OD', ''), 10); // Loại bỏ 'OD' và chuyển sang số
+      newCode = `OD${(latestCodeNumber + 1).toString().padStart(3, '0')}`; // Tăng giá trị và định dạng lại
+    }
+
+    // Tạo đơn hàng mới
+    const newOrder = new Order({
+      user_id,
+      product_id,
+      code: newCode,
+      status: status || 'in_progress', // Mặc định trạng thái đơn hàng là in_progress
+    });
+    await newOrder.save();
+
+    // Cập nhật trạng thái sản phẩm thành in_order
+    product.status = 'in_order';
+    await product.save();
+
+    res.status(201).json({ message: 'Tạo đơn hàng thành công!', order: newOrder });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Lỗi server!' });
+  }
+};
   
 
 // Cập nhật đơn hàng

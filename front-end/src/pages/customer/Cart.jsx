@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import withCustomerLayout from "../../hoc/withCustomerLayout";
 import { UserContext } from "../../contexts/userContext";
 import BreadCrumb from "../../components/customerLayout/breadcrumb";
+import API from "../../api";
 
 class Card extends Component {
   static contextType = UserContext;
@@ -11,16 +12,10 @@ class Card extends Component {
     paymentMethod: "",
   };
 
-  handleDelete = (itemDelete) => {
-    const { user, setCarts } = this.context;
-    const carts = JSON.parse(localStorage.getItem("carts")) || [];
-
-    const updatedCarts = carts.filter(
-      (item) =>
-        item.order_car_code !== itemDelete.order_car_code &&
-        item.customer_id === user.id
-    );
-    setCarts(updatedCarts);
+  handleDelete = async(itemDelete) => {
+    await API.delete(`/carts/${itemDelete._id}`)
+    const { setCarts } = this.context;
+    setCarts();
   };
 
   togglePaymentOptions = () => {
@@ -31,7 +26,7 @@ class Card extends Component {
     this.setState({ paymentMethod: method });
   };
 
-  handleConfirmOrder = () => {
+  handleConfirmOrder = async() => {
 		const { user, carts, setCarts } = this.context;
     const { paymentMethod } = this.state;
     if (!paymentMethod) {
@@ -39,60 +34,26 @@ class Card extends Component {
       return;
     }
 
-		const listOrder = JSON.parse(localStorage.getItem("listOrder")) || [];
-    const listProduct = JSON.parse(localStorage.getItem("listProduct")) || [];
-    const listPayment = JSON.parse(localStorage.getItem("listPayment")) || [];
+    for (const item of carts) {
+      const { data } = await API.post('/orders', {
+        "user_id": user._id, 
+        "product_id": item.product_id._id, 
+        "status": "in_progress"
+      });
+    
+      console.log(data);
+    
+      await API.post('/payments', {
+        "user_id": user._id, 
+        "order_id": data.order._id, 
+        "total": item.product_id.price,
+        "payment_method": paymentMethod
+      });
+    
+      await API.delete(`/carts/${item._id}`);
+    }
 
-    carts.forEach((item, index) => {
-      const newOrderId = listOrder.length ? Math.max(...listOrder.map((order) => order.id)) + 1 + index : 1 + index;
-      const newOrderCode = `OD${String(newOrderId).padStart(3, "0")}`;
-
-      const newOrder = {
-        id: newOrderId,
-        user_id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        address: user.address,
-        order_car_code: item.order_car_code,
-        code: newOrderCode,
-        status: "in_progress",
-        created_at: new Date().toISOString(),
-      };
-
-      listOrder.push(newOrder);
-
-			const newPaymentId = listPayment.length ? Math.max(...listPayment.map((payment) => payment.id)) + 1 : 1;
-      const newPayment = {
-        id: newPaymentId,
-        order_code: newOrderCode,
-        total: item.price,
-        payment_method: paymentMethod,
-        status: "confirming",
-        created_at: new Date().toISOString(),
-      };
-
-      listPayment.push(newPayment);
-
-
-			const productIndex = listProduct.findIndex(
-        (product) => product.code === item.order_car_code
-      );
-
-      if (productIndex !== -1) {
-        listProduct[productIndex].status = "in_order";
-      }
-    });
-
-    localStorage.setItem("listOrder", JSON.stringify(listOrder));
-    localStorage.setItem("listProduct", JSON.stringify(listProduct));
-    localStorage.setItem("listPayment", JSON.stringify(listPayment));
-
-		const updatedCarts = carts.filter(
-      (item) =>
-        item.customer_id !== user.id
-    );
-    setCarts(updatedCarts);
+    await setCarts();
 
     alert(`Đặt hàng thành công với phương thức thanh toán: ${paymentMethod}`);
     this.setState({ showPaymentOptions: false, paymentMethod: "" });
@@ -116,12 +77,12 @@ class Card extends Component {
             <thead>
               {carts.map((item, index) => (
                 <tr className="border-b" key={index}>
-                  <td className="py-4">{item.order_car_code}</td>
+                  <td className="py-4">{item?.product_id.code}</td>
 
-                  <td className="text-lg font-semibold">{item.product_name}</td>
+                  <td className="text-lg font-semibold">{item?.product_id.model}</td>
 
                   <td>
-                    {new Intl.NumberFormat("vi-VN").format(item?.price)} vnđ
+                    {new Intl.NumberFormat("vi-VN").format(item?.product_id.price)} vnđ
                   </td>
                   <td className="w-[20px]">
                     <button onClick={() => this.handleDelete(item)}>Xóa</button>
