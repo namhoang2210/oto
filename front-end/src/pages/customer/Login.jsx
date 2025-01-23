@@ -7,6 +7,7 @@ import Logo from "../../components/shared/Logo";
 import { withNavigate } from "../../hoc/withNavigate";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../contexts/userContext";
+import API from "../../api";
 
 class Login extends Component {
 	static contextType = UserContext;
@@ -29,19 +30,30 @@ class Login extends Component {
     }
   }
 
-  handleSubmit = (values, { setFieldError }) => {
-		const { setUser } = this.context;
-    const customers = JSON.parse(localStorage.getItem("listCustomer")) || [];
-    const user = customers.find(
-      (u) => u.username === values.username && u.password === values.password
-    );
-    if (user) {
-      localStorage.setItem("isAuthenticated", "customer");
-      setUser(user); 
-      this.props.navigate("/");
-    } else {
-      setFieldError("username", "Invalid username or password");
-    }
+  handleSubmit = async(values, { setFieldError }) => {
+	const { setUser } = this.context;
+	try {
+		const response = await API.post("/customer/login", {
+		  username: values.username,
+		  password: values.password,
+		});
+  
+		const { token, user } = response.data;
+  
+		// Lưu token và thông tin user vào localStorage
+		localStorage.setItem("isAuthenticated", "customer");
+		localStorage.setItem("token", token);
+		localStorage.setItem("user", JSON.stringify(user));
+		setUser(user)
+		// Chuyển hướng đến trang chủ
+		this.props.navigate("/");
+	  } catch (error) {
+		if (error.response && error.response.status === 400) {
+		  setFieldError("username", "Sai tài khoản hoặc mật khẩu");
+		} else {
+		  setFieldError("username", "Lỗi kết nối tới server");
+		}
+	  }
   };
 
   render() {

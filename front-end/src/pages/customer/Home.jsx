@@ -3,6 +3,7 @@ import withCustomerLayout from '../../hoc/withCustomerLayout';
 import CarCard from '../../components/home/carCard';
 import SearchIcon from '../../components/icons/Search';
 import BreadCrumb from '../../components/customerLayout/breadcrumb';
+import API from "../../api";
 
 class Home extends Component {
   constructor(props) {
@@ -18,13 +19,14 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    const storedProducts = localStorage.getItem("listProduct");
-    if (storedProducts) {
-      let products = JSON.parse(storedProducts);
-      products = products.filter(product => product.status === 'in_stock');
-      products.sort((a, b) => b.id - a.id);
-      this.setState({ products, filteredProducts: products });
-    }
+    API.get('/products?status=in_stock')
+    .then((response) => {
+      const products = response.data;
+      products.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      this.setState({ products, filteredProducts: products });    })
+    .catch((error) => {
+      console.error('Error fetching products:', error);
+    });
   }
 
   handleSearch = (event) => {
@@ -140,7 +142,7 @@ class Home extends Component {
             Có {filteredProducts.length} xe rao bán
             <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-6'>
               {filteredProducts.length > 0 && filteredProducts.map(product => (
-                <CarCard key={product.id} data={product} />
+                <CarCard key={product._id} data={product} />
               ))}
             </div>
           </div>
