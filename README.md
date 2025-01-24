@@ -59,4 +59,3 @@
 
 3. **Truy cập url admin**:
     - http://localhost:3000/admin/login
-    - Do chưa hoàn thành phía customer (đăng kí, tạo đơn hàng) nên data customer, order, payment trong màn admin có thể tạo thông qua API(file postman đã đính kèm)
