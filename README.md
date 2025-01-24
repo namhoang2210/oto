@@ -57,5 +57,6 @@
    npm start
    ```
 
-3. **Truy cập url admin**:
-    - http://localhost:3000/admin/login
+3. **Truy cập url**:
+    - admin: http://localhost:3000/admin/login
+    - customer: http://localhost:3000
